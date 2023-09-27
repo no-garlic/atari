@@ -1,0 +1,23 @@
+ 
+    processor 6502
+
+    seg code
+    org $F000           ; set the code origin at $F000
+
+Start:
+    sei                 ; disable interrupts
+    cld                 ; disable bcd decimal math mode
+    ldx #$FF            ; loads the X register with #$FF
+    txs                 ; transfers X register to the stack pointer
+    
+    lda #0              ; A = 0  
+    ldx #$00            ; X = #$00
+
+MemLoop:
+    dex                 ; X-- (the first value the loop sees is $FF as X is initialised to $00 and then decremented)
+    sta $0,X            ; Store the value of A inside address $0 + X
+    bne MemLoop         ; Loop until Z-Flag == 0
+
+    org $FFFC           ; set the code origin at $FFFC
+    .word Start         ; reset vector
+    .word Start         ; interrupt vector
